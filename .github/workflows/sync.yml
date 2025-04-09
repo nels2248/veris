@@ -27,16 +27,16 @@ jobs:
 
           # Enable sparse-checkout
           git sparse-checkout init --cone
-          git sparse-checkout set data/json  # replace with folder you want
-          git pull origin main
+          git sparse-checkout set data/json
+          git pull origin master
 
-          # Copy the folder into your repo
           cd ..
           rm -rf data/json  # Optional: clean old copy
-          cp -r publicrepo/data-folder ./data/
+          mkdir -p data
+          cp -r publicrepo/data/json ./data/
 
       - name: Commit and Push Changes
         run: |
           git add .
-          git commit -m "Auto-sync data-folder from public repo" || echo "No changes"
+          git commit -m "Auto-sync data/json from VCDB" || echo "No changes"
           git push
