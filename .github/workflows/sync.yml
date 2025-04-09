@@ -30,7 +30,9 @@ jobs:
           # Enable sparse-checkout
           git sparse-checkout init --cone
           git sparse-checkout set data/json
-          git pull origin master
+
+          # Pull from the 'main' branch (not 'master')
+          git pull origin main
 
           # Optional: clean old copy of data/json
           rm -rf data/json
