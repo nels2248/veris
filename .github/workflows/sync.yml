@@ -1,0 +1,42 @@
+name: Sync Public Folder
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # Every day at 3am UTC
+  workflow_dispatch:
+
+jobs:
+  sync-folder:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Personal Repo
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Sparse Checkout
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          mkdir publicrepo
+          cd publicrepo
+          git init
+          git remote add origin https://github.com/vz-risk/VCDB.git
+
+          # Enable sparse-checkout
+          git sparse-checkout init --cone
+          git sparse-checkout set data/json  # replace with folder you want
+          git pull origin main
+
+          # Copy the folder into your repo
+          cd ..
+          rm -rf data/json  # Optional: clean old copy
+          cp -r publicrepo/data-folder ./data/
+
+      - name: Commit and Push Changes
+        run: |
+          git add .
+          git commit -m "Auto-sync data-folder from public repo" || echo "No changes"
+          git push
