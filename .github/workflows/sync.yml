@@ -21,7 +21,11 @@ jobs:
           git config --global user.email "github-actions@github.com"
 
           git init
-          git remote add origin https://github.com/vz-risk/VCDB.git
+
+          # Check if remote exists, and only add if it doesn't
+          if ! git remote get-url origin; then
+            git remote add origin https://github.com/vz-risk/VCDB.git
+          fi
 
           # Enable sparse-checkout
           git sparse-checkout init --cone
