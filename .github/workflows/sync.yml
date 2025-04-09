@@ -20,8 +20,8 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
-          mkdir publicrepo
-          cd publicrepo
+          #mkdir publicrepo
+          #cd publicrepo
           git init
           git remote add origin https://github.com/vz-risk/VCDB.git
 
