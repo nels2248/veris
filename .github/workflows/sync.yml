@@ -34,6 +34,16 @@ jobs:
           # Pull from the 'main' branch (not 'master')
           git pull origin main
 
+          # List the files in the repo to debug
+          echo "Listing files after sparse-checkout:"
+          ls -R
+
+          # Check if the 'data/json' folder exists
+          if [ ! -d "data/json" ]; then
+            echo "data/json folder not found!"
+            exit 1
+          fi
+
           # Optional: clean old copy of data/json
           rm -rf data/json
 
