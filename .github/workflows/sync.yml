@@ -47,8 +47,11 @@ jobs:
           # Optional: clean old copy of data/json
           rm -rf data/json
 
+          # Create the target folder (in case it doesn't exist)
+          mkdir -p ./data
+
           # Copy the sparse-checkout folder directly to your local data folder
-          cp -r data/json
+          cp -r data/json ./data/
 
       - name: Commit and Push Changes
         run: |
