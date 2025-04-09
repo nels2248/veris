@@ -48,7 +48,7 @@ jobs:
           rm -rf data/json
 
           # Copy the sparse-checkout folder directly to your local data folder
-          cp -r data/json ./data/
+          cp -r data/json
 
       - name: Commit and Push Changes
         run: |
