@@ -40,3 +40,4 @@ jobs:
           git add .
           git commit -m "Auto-sync data/json from VCDB" || echo "No changes"
           git push
+# Test change to trigger workflow registration
