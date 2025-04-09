@@ -1,43 +1,10 @@
-name: Sync Public Folder
+name: Test Actions Setup
 
 on:
-  schedule:
-    - cron: '0 3 * * *'  # Every day at 3am UTC
   workflow_dispatch:
 
 jobs:
-  sync-folder:
+  test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Personal Repo
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup Sparse Checkout
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-
-          mkdir publicrepo
-          cd publicrepo
-          git init
-          git remote add origin https://github.com/vz-risk/VCDB.git
-
-          # Enable sparse-checkout
-          git sparse-checkout init --cone
-          git sparse-checkout set data/json
-          git pull origin master
-
-          cd ..
-          rm -rf data/json  # Optional: clean old copy
-          mkdir -p data
-          cp -r publicrepo/data/json ./data/
-
-      - name: Commit and Push Changes
-        run: |
-          git add .
-          git commit -m "Auto-sync data/json from VCDB" || echo "No changes"
-          git push
-# Test change to trigger workflow registration
+      - run: echo "✅ GitHub Actions is working!"
