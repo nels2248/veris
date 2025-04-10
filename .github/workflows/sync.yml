@@ -25,15 +25,14 @@ jobs:
             mkdir publicrepo
           fi
           cd publicrepo
-          
-          # Initialize Git and set remote
-          git init
-          git remote add origin https://github.com/vz-risk/VCDB.git
+
+          # Clone the public repository directly instead of using 'git init'
+          git clone --single-branch --branch main https://github.com/vz-risk/VCDB.git .
 
           # Enable sparse-checkout
           git sparse-checkout init --cone
           git sparse-checkout set data/json
-          git pull origin master
+          git pull origin main
 
           cd ..
           
