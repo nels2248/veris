@@ -26,13 +26,13 @@ jobs:
           fi
           cd publicrepo
 
-          # Clone the public repository directly instead of using 'git init'
-          git clone --single-branch --branch main https://github.com/vz-risk/VCDB.git .
+          # Clone the public repository and use 'master' branch if 'main' is not available
+          git clone --single-branch --branch master https://github.com/vz-risk/VCDB.git .
 
           # Enable sparse-checkout
           git sparse-checkout init --cone
           git sparse-checkout set data/json
-          git pull origin main
+          git pull origin master
 
           cd ..
           
