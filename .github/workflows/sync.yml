@@ -37,8 +37,8 @@ jobs:
           # Attempt to fetch 'data/json' folder
           git sparse-checkout set data/json
 
-          # Pull from the 'main' branch (not 'master')
-          git pull origin main
+          # Pull from the 'master' branch (since that's the correct branch)
+          git pull origin master
 
           # List files after sparse-checkout
           echo "Listing files after sparse-checkout:"
