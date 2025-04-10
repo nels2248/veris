@@ -2,7 +2,7 @@ name: Sync Public Folder
 
 on:
   schedule:
-    - cron: '0 7 * * *'  # 1 AM Central Time (7 AM UTC)
+    - cron: '0 3 * * *'  # Every day at 3am UTC
   workflow_dispatch:
 
 jobs:
@@ -20,47 +20,24 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
+          mkdir publicrepo
+          cd publicrepo
           git init
-
-          # Check if remote exists, and only add if it doesn't
-          if ! git remote get-url origin; then
-            git remote add origin https://github.com/vz-risk/VCDB.git
-          fi
+          git remote add origin https://github.com/vz-risk/VCDB.git
 
           # Enable sparse-checkout
           git sparse-checkout init --cone
-
-          # List the available files in the remote repository to debug
-          echo "Listing all files in the remote repository:"
-          git ls-tree -r HEAD --name-only
-
-          # Attempt to fetch 'data/json' folder
           git sparse-checkout set data/json
+          git pull origin master
 
-          # Pull from the 'main' branch (since it's the default branch)
-          git pull origin main
-
-          # List files after sparse-checkout
-          echo "Listing files after sparse-checkout:"
-          ls -R
-
-          # Check if the 'data/json' folder exists
-          if [ ! -d "data/json" ]; then
-            echo "data/json folder not found!"
-            exit 1
-          fi
-
-          # Optional: clean old copy of data/json
-          rm -rf data/json
-
-          # Create the target folder (in case it doesn't exist)
-          mkdir -p ./data
-
-          # Copy the sparse-checkout folder directly to your local data folder
-          cp -r data/json ./data/
+          cd ..
+          rm -rf data/json  # Optional: clean old copy
+          mkdir -p data
+          cp -r publicrepo/data/json ./data/
 
       - name: Commit and Push Changes
         run: |
           git add .
           git commit -m "Auto-sync data/json from VCDB" || echo "No changes"
           git push
+# Test change to trigger workflow registration
