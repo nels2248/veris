@@ -20,8 +20,13 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
-          mkdir publicrepo
+          # Check if 'publicrepo' directory exists before creating it
+          if [ ! -d "publicrepo" ]; then
+            mkdir publicrepo
+          fi
           cd publicrepo
+          
+          # Initialize Git and set remote
           git init
           git remote add origin https://github.com/vz-risk/VCDB.git
 
@@ -31,8 +36,14 @@ jobs:
           git pull origin master
 
           cd ..
-          rm -rf data/json  # Optional: clean old copy
+          
+          # Clean old copy of 'data/json' (optional)
+          rm -rf data/json
+          
+          # Create the target directory if it doesn't exist
           mkdir -p data
+          
+          # Copy the 'data/json' directory from 'publicrepo' into the local 'data' folder
           cp -r publicrepo/data/json ./data/
 
       - name: Commit and Push Changes
@@ -40,4 +51,3 @@ jobs:
           git add .
           git commit -m "Auto-sync data/json from VCDB" || echo "No changes"
           git push
-# Test change to trigger workflow registration
