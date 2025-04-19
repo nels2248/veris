@@ -83,5 +83,7 @@ if 'timeline.incident.year' in df.columns:
     df['timeline.incident.year'].value_counts().sort_index().plot(kind='line', marker='o', title='Incidents Over Time')
     plt.show()
 
+#export to excel. Sometimes easier to sort and filter to look at specific examples this way.  
+df.to_excel('output.xlsx', index=False)
 print('ending')
 print(datetime.datetime.now()) 
