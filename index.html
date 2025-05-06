@@ -31,6 +31,7 @@
             height: 100%;
             border: none;
         }
+		 
 
         .placeholder {
             display: flex;
@@ -40,6 +41,18 @@
             color: #555;
             font-size: 1.2em;
         }
+		
+		.iframe-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* or any fixed height like 600px */
+  }
+
+  .iframe-container iframe {
+    flex: 1 1 50%;
+    width: 100%;
+    border: none;
+  }
     </style>
 </head>
 <body>
@@ -49,20 +62,22 @@
         <div class="grid-item iframe-container">
             <iframe src="exploratoryanalysis.html"></iframe>
         </div>
-		<!-- Top-left: correlated columns -->
+		<!-- Top-right: correlated columns -->
 		<div class="grid-item iframe-container">
             <iframe src="correlatedcolumns.html"></iframe>
         </div>
 
-        <!-- Top-right: placeholder -->
+        <!-- Bottom left: placeholder -->
         <div class="grid-item iframe-container">
-            <iframe src="incident_running_total_with_hover_victims.html"></iframe>
-        </div>
+			<iframe src="top_industry_per_month_final.html"></iframe>
+            <iframe src="incident_running_total_with_hover_victims.html"></iframe>			
+        </div> 
+		 
 		 
 
         <!-- Bottom-right: placeholder -->
-        <div class="grid-item placeholder">
-            Predictions will go here
+        <div class="grid-item iframe-container">
+            <iframe src="last10incidents.html"></iframe>
         </div>
     </div>
 

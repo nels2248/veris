@@ -3,6 +3,7 @@ import os
 import json
 import pandas as pd
 from sys import platform
+import numpy as np
 
 #VARIABLES
 #PATH TO LOCAL FILE. 
@@ -166,4 +167,75 @@ html_content_correlated  = header + html_content_correlated + "</body></html>"
 with open('correlatedcolumns.html', 'w') as file:
     file.write(html_content_correlated)
 
-print("Correlated columns saved to correlatedcolumns.html")
+#CREATE A DATA COLUMN THAT SHOWS ALL COLUMNS WITH VALUES.  WILL BE USED TO SHOW RECENT RECORDS IN AN EASIER WAY TO DISPLAY DATA
+# Robust is_valid function
+# Function to format valid values
+def format_valid_fields(row):
+    result = []
+    for col in df.columns:
+        val = row[col]
+        try:
+            if pd.isnull(val):
+                continue
+            elif isinstance(val, (list, np.ndarray, pd.Series)):
+                if len(val) > 0 and any(bool(x) for x in val):
+                    result.append(f"{col}: {val}")
+            elif val != 0 and bool(val):
+                result.append(f"{col}: {val}")
+        except Exception:
+            continue
+    return '<br>'.join(result)
+
+# Create new column
+df['FieldsWithValues'] = df.apply(format_valid_fields, axis=1)
+
+# Sort and get last 10
+# Exclude rows where incident_date is NaT
+df = df[df['incident_date'].notna()]
+
+# Then sort and get last 10
+last10 = df[df['incident_date'].notna()].sort_values('incident_date', ascending=False).head(10)
+
+
+# Build HTML rows (2-column grid)
+html_rows = ""
+for _, row in last10.iterrows():
+    html_rows += f"""
+    <div class="record">
+        <strong>{row['incident_date'].strftime('%B %d, %Y')}</strong><br>
+        {row['FieldsWithValues']}
+    </div>
+    """
+
+html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Last 10 Incidents</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }}
+        .record {{
+            width: 100%;
+            box-sizing: border-box;
+            padding: 15px;
+            border-bottom: 1px solid #ccc;
+        }}
+        .record:last-child {{
+            border-bottom: none;
+        }}
+    </style>
+</head>
+<body>
+    <h2>Last 10 Incidents</h2>
+    {html_rows}
+</body>
+</html>
+"""
+
+# Write to file
+with open("last10incidents.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
