@@ -123,3 +123,47 @@ html_content = f"""
 # SAVE HTML PAGE
 with open("exploratoryanalysis.html", "w", encoding="utf-8") as f:
     f.write(html_content)
+
+    
+#CREATE CORELATION PAIRS
+# Create a new DataFrame with column names as rows
+columns_as_rows = pd.DataFrame(df.columns, columns=['Column Names'])
+
+# Compute correlation matrix
+corr_matrix = df.corr(numeric_only=True)
+
+# Get the pairs of most correlated features (excluding self-correlations)
+corr_pairs = corr_matrix.unstack().sort_values(ascending=False)
+
+# Filter out self-correlations (where the correlation is 1) and duplicates (pairs like A-B and B-A)
+corr_pairs = corr_pairs[corr_pairs < 1]
+
+# Convert the multi-index series to a DataFrame and remove duplicates
+corr_df = pd.DataFrame(corr_pairs).reset_index()
+corr_df.columns = ['Feature 1', 'Feature 2', 'Correlation']
+
+# Ensure that pairs like (A, B) and (B, A) are not duplicated
+corr_df = corr_df[corr_df.apply(lambda row: row['Feature 1'] < row['Feature 2'], axis=1)]
+
+# Save the correlation pairs to an HTML table
+html_content_correlated = corr_df.to_html(index=False, escape=False)
+
+# Add a header to the HTML content
+header = """
+<html>
+<head>
+    <title>Correlated Columns</title>
+</head>
+<body>
+    <h1>Correlated Columns</h1>
+    <p>Here are the most correlated feature pairs from your data, excluding self-correlations and duplicates.</p>
+"""
+
+# Combine the header and the HTML table
+html_content_correlated  = header + html_content_correlated + "</body></html>"
+
+# Write the content to an HTML file
+with open('correlatedcolumns.html', 'w') as file:
+    file.write(html_content_correlated)
+
+print("Correlated columns saved to correlatedcolumns.html")
