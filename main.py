@@ -4,7 +4,15 @@ import json
 import pandas as pd
 from sys import platform
 import numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+import seaborn as sns
+import base64
+from io import BytesIO
 
+ 
 #VARIABLES
 #PATH TO LOCAL FILE. 
 #ASSUMES THAT NIGHTLY THIS WILL BE PULLED DOWN INTO THIS FOLDER AND RUN FROM THERE.
@@ -239,3 +247,61 @@ html_content = f"""
 # Write to file
 with open("last10incidents.html", "w", encoding="utf-8") as f:
     f.write(html_content)
+    
+    
+# Step 1: Drop mostly-empty columns
+df_filtered = df.loc[:, df.isnull().mean() < 0.5]
+
+# Step 2: Keep numeric data
+df_numeric = df_filtered.select_dtypes(include=[np.number])
+
+# Step 3: Fill missing values
+df_numeric = df_numeric.fillna(df_numeric.mean())
+
+# Now you're safe to scale and cluster
+# --- Step 2: Standardize the Data ---
+scaler = StandardScaler()
+scaled_data = scaler.fit_transform(df_numeric)
+
+# --- Step 3: Apply KMeans Clustering ---
+kmeans = KMeans(n_clusters=3, random_state=42)
+clusters = kmeans.fit_predict(scaled_data)
+df_numeric['Cluster'] = clusters
+
+# --- Step 4: Reduce to 2D for Visualization ---
+pca = PCA(n_components=2)
+pca_components = pca.fit_transform(scaled_data)
+df_numeric['PC1'] = pca_components[:, 0]
+df_numeric['PC2'] = pca_components[:, 1]
+
+# --- Step 5: Plot the Clusters ---
+plt.figure(figsize=(8, 6))
+sns.scatterplot(data=df_numeric, x='PC1', y='PC2', hue='Cluster', palette='Set2')
+plt.title('PCA Cluster Plot')
+
+# Save plot to base64 for embedding
+buf = BytesIO()
+plt.savefig(buf, format="png")
+buf.seek(0)
+img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+buf.close()
+
+# --- Step 6: Save HTML Report ---
+html_report = f"""
+<html>
+<head><title>Clustering Report</title></head>
+<body>
+<h1>Clustering Report</h1>
+<h2>Clustered Data (first 10 rows)</h2>
+{df_numeric.head(10).to_html(index=False)}
+
+<h2>Cluster Plot (via PCA)</h2>
+<img src="data:image/png;base64,{img_base64}" />
+</body>
+</html>
+"""
+
+with open("clustering_report.html", "w") as f:
+    f.write(html_report)
+
+print("✅ Clustering report saved as 'clustering_report.html'")
